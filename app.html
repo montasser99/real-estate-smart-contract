@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/web3@4.16.0/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="app.css">
+
+    <title>DApp</title>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div>
+            <a href="index.html">Accueil</a>
+            <a href="profil.html">Profil</a>
+            <a href="app.html" id="contractLink" >Contrat</a>
+            <a href="properties.html" >tous mes proprietes</a>
+
+        </div>
+        <div>
+            <a href="#" onclick="logout()">Déconnecter</a>
+        </div>
+    </nav>
+
+    <!-- Accueil Section -->
+    <section id="home" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2>Bienvenue sur la DApp</h2>
+            <p>Commencez à interagir avec le contrat intelligent en enregistrant ou en gérant des propriétés.</p>
+            <div style="color:green">
+                <span id="userAccount">Chargement...</span>
+            </div>
+        </div>
+        <div>
+            <img src="images/Contract.png" alt="Contract Image" style="max-width: 200px; height: auto;">
+        </div>
+    </section>
+
+    <!-- Cards with property management form -->
+    <div class="card">
+        <!-- Section with Smart Contract form -->
+        <section id="form">
+            <h3>Enregistrer une propriété</h3>
+            <label for="name">Nom de la propriété :</label>
+            <input type="text" id="name" placeholder="Entrez le nom de la propriété">
+
+            <label for="location">Emplacement :</label>
+            <input type="text" id="location" placeholder="Entrez l'emplacement">
+
+            <label for="price">Prix (ETH) :</label>
+            <input type="number" id="price" placeholder="Entrez le prix">
+
+            <button type="button" onclick="registerProperty()">Enregistrer la propriété</button>
+            <div id="registerStatus" class="status"></div>
+        </section>
+    </div>
+
+    <!-- Cards for Property Transfer Section -->
+    <div class="card">
+        <!-- Section to transfer properties -->
+        <section id="transfer">
+            <h3>Transférer une propriété</h3>
+            <label for="propertyId">ID de la propriété :</label>
+            <input type="text" id="propertyId" placeholder="Entrez l'ID de la propriété">
+
+            <label for="newOwner">Nouvelle adresse du propriétaire :</label>
+            <input type="text" id="newOwner" placeholder="Entrez l'adresse du nouveau propriétaire">
+
+            <button type="button" onclick="transferProperty()">Transférer la propriété</button>
+            <div id="transferStatus" class="status"></div>
+        </section>
+    </div>
+
+    <!-- Cards for Fetch Properties Section -->
+    <div class="card">
+        <!-- Section to get properties of an owner -->
+        <section id="properties">
+            <h3>Obtenir les propriétés d'un propriétaire</h3>
+            <label for="ownerAddress">Adresse du propriétaire :</label>
+            <input type="text" id="ownerAddress" placeholder="Entrez l'adresse du propriétaire">
+
+            <button type="button" onclick="getPropertiesOfOwner()">Obtenir les propriétés</button>
+            <div id="propertiesResult" class="status"></div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Blockchain DApp | Propulsé par Ethereum & Web3</p>
+    </footer>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const currentPage = window.location.href; // Récupérer l'URL actuelle
+        
+            // Sélectionner tous les liens
+            const homeLink = document.querySelector('a[href="index.html"]');
+            const profileLink = document.querySelector('a[href="profil.html"]');  // Corrected to match profil.html
+            const contractLink = document.getElementById("contractLink");
+        
+            // Appliquer la classe active selon l'URL actuelle
+            if (currentPage.includes("index.html")) {
+                homeLink.classList.add("active");
+            } else if (currentPage.includes("profil.html")) {  // Corrected here as well
+                profileLink.classList.add("active");
+            } else if (currentPage.includes("app.html")) {  // Ensure this checks for app.html
+                contractLink.classList.add("active");
+            }
+        });
+        
+
+        let web3;
+        let account;
+        let contract;
+        const contractAddress = "0x658b410E58c92417047AeA7cBed11dcf38A30B95"; // Remplacez par l'adresse de votre contrat
+
+        // Charger l'ABI depuis un fichier JSON
+        async function loadABI() {
+            try {
+                const response = await fetch('contractABI.json'); // Replace with the correct path to your contractABI.json
+                const abi = await response.json();
+                return abi;
+            } catch (error) {
+                console.error('Error loading ABI:', error);
+            }
+        }
+
+        // Charger le compte depuis le stockage local
+        document.addEventListener("DOMContentLoaded", async () => {
+            const storedAccount = localStorage.getItem("userAccount");
+            if (!storedAccount) {
+                alert("Aucun compte connecté. Veuillez vous connecter à MetaMask d'abord.");
+                window.location.href = "index.html";
+                return;
+            }
+
+            account = storedAccount;
+            document.getElementById("userAccount").innerText = `Compte connecté : ${account}`;
+
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                try {
+                    await ethereum.request({ method: "eth_requestAccounts" });
+                    const abi = await loadABI();  // Load ABI dynamically
+                    contract = new web3.eth.Contract(abi, contractAddress);
+                    console.log("Contrat initialisé :", contract);
+                } catch (err) {
+                    console.error("Erreur lors de l'initialisation du contrat :", err);
+                    alert("Échec du chargement du contrat intelligent.");
+                }
+            } else {
+                alert("MetaMask non détecté. Veuillez installer MetaMask.");
+            }
+        });
+
+        async function registerProperty() {
+            const name = document.getElementById("name").value.trim();
+            const location = document.getElementById("location").value.trim();
+            const price = document.getElementById("price").value.trim();
+
+            if (!name || !location || !price) {
+                document.getElementById("registerStatus").innerText = "Veuillez remplir tous les champs.";
+                document.getElementById("registerStatus").classList.add("error");
+                return;
+            }
+
+            try {
+                const weiPrice = web3.utils.toWei(price, "ether");
+                await contract.methods.registerProperty(name, location, weiPrice).send({ from: account });
+                document.getElementById("registerStatus").innerText = "Propriété enregistrée avec succès!";
+                document.getElementById("registerStatus").classList.remove("error");
+            } catch (error) {
+                console.error("Erreur lors de l'enregistrement de la propriété :", error);
+                document.getElementById("registerStatus").innerText = "Erreur lors de l'enregistrement de la propriété.";
+                document.getElementById("registerStatus").classList.add("error");
+            }
+        }
+
+        async function transferProperty() {
+            const propertyId = document.getElementById("propertyId").value.trim();
+            const newOwner = document.getElementById("newOwner").value.trim();
+
+            if (!propertyId || !newOwner) {
+                document.getElementById("transferStatus").innerText = "Veuillez remplir tous les champs.";
+                document.getElementById("transferStatus").classList.add("error");
+                return;
+            }
+
+            try {
+                await contract.methods.transferProperty(propertyId, newOwner).send({ from: account });
+                document.getElementById("transferStatus").innerText = "Propriété transférée avec succès!";
+                document.getElementById("transferStatus").classList.remove("error");
+            } catch (error) {
+                console.error("Erreur lors du transfert de la propriété :", error);
+                document.getElementById("transferStatus").innerText = "Erreur lors du transfert de la propriété.";
+                document.getElementById("transferStatus").classList.add("error");
+            }
+        }
+
+        async function getPropertiesOfOwner() {
+            const ownerAddress = document.getElementById("ownerAddress").value.trim();
+
+            if (!ownerAddress) {
+                document.getElementById("propertiesResult").innerText = "Veuillez entrer une adresse.";
+                return;
+            }
+
+            try {
+                const properties = await contract.methods.getPropertiesOfOwner(ownerAddress).call();
+                let resultText = "Propriétés :\n";
+                properties.forEach(property => {
+                    resultText += `ID: ${property.id}, Nom: ${property.name}, Prix: ${web3.utils.fromWei(property.price, "ether")} ETH\n`;
+                });
+                document.getElementById("propertiesResult").innerText = resultText;
+            } catch (error) {
+                console.error("Erreur lors de la récupération des propriétés :", error);
+                document.getElementById("propertiesResult").innerText = "Erreur lors de la récupération des propriétés.";
+            }
+        }
+        function logout() {
+            localStorage.removeItem("userAccount");
+            alert("You have been logged out.");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+
+</html>

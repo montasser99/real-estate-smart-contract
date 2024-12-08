@@ -1,0 +1,121 @@
+********NB : type de fichier .sol dans remixIDE ***************
+********Code********
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract RealEstate {
+    struct Property {
+        uint256 id;
+        string name;
+        string location;
+        uint256 price;
+        address currentOwner;
+    }
+
+    uint256 public nextPropertyId;
+    mapping(uint256 => Property) public properties;
+    mapping(address => uint256[]) public ownerProperties;
+
+    event PropertyRegistered(
+        uint256 id,
+        string name,
+        string location,
+        uint256 price,
+        address owner
+    );
+    event PropertyTransferred(uint256 id, address from, address to);
+
+    // Ajoutez cette ligne pour déclarer l'événement PropertyDeleted
+    event PropertyDeleted(uint256 id, address owner);
+
+    // Fonction pour enregistrer un nouveau bien immobilier
+    function registerProperty(
+        string memory _name,
+        string memory _location,
+        uint256 _price
+    ) public {
+        uint256 propertyId = nextPropertyId++; // Générer un ID unique pour la propriété
+        properties[propertyId] = Property(
+            propertyId,
+            _name,
+            _location,
+            _price,
+            msg.sender
+        ); // Enregistrer la propriété
+        ownerProperties[msg.sender].push(propertyId); // Ajouter cette propriété à la liste de l'utilisateur
+        emit PropertyRegistered(
+            propertyId,
+            _name,
+            _location,
+            _price,
+            msg.sender
+        ); // Émettre un événement de succèes
+    }
+
+    // Fonction pour transférer la propriété d'un bien immobilier
+    function transferProperty(uint256 _propertyId, address _newOwner) public {
+        Property storage property = properties[_propertyId];
+        require(
+            property.currentOwner == msg.sender,
+            "You are not the owner of this property"
+        );
+        property.currentOwner = _newOwner;
+
+        // Mise à jour des biens de l'ancien et du nouveau propriétaire
+        _removePropertyFromOwner(msg.sender, _propertyId);
+        ownerProperties[_newOwner].push(_propertyId);
+
+        emit PropertyTransferred(_propertyId, msg.sender, _newOwner);
+    }
+
+    function getAllProperties() public view returns (Property[] memory) {
+        uint256 propertyCount = nextPropertyId;
+        Property[] memory allProperties = new Property[](propertyCount);
+
+        for (uint256 i = 0; i < propertyCount; i++) {
+            allProperties[i] = properties[i];
+        }
+
+        return allProperties;
+    }
+
+    // Fonction pour supprimer un bien immobilier
+    function deleteProperty(uint256 _propertyId) public {
+        Property storage property = properties[_propertyId];
+        require(
+            property.currentOwner == msg.sender,
+            "You are not the owner of this property"
+        );
+
+        delete properties[_propertyId]; // Supprime la propriété
+        _removePropertyFromOwner(msg.sender, _propertyId);
+
+        emit PropertyDeleted(_propertyId, msg.sender); // Émet un événement pour le frontend
+    }
+
+    // Fonction privée pour retirer une propriété de l'ancien propriétaire
+    function _removePropertyFromOwner(address _owner, uint256 _propertyId)
+        private
+    {
+        uint256[] storage propertyList = ownerProperties[_owner];
+        for (uint256 i = 0; i < propertyList.length; i++) {
+            if (propertyList[i] == _propertyId) {
+                propertyList[i] = propertyList[propertyList.length - 1];
+                propertyList.pop();
+                break;
+            }
+        }
+    }
+
+    // 0x4148bf52fd7a41101e159b39faa0320053437576
+
+    // Fonction pour obtenir les propriétés d'un propriétaire
+    function getPropertiesOfOwner(address _owner)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        return ownerProperties[_owner];
+    }
+}

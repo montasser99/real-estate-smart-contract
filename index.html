@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/web3@4.16.0/dist/web3.min.js"></script>
+    <title>MetaMask Connection</title>
+    <link rel="stylesheet" href="index.css">
+
+
+</head>
+
+<body>
+
+
+
+    <section class="hero-area" style="position: relative; height: 500px; background-color: #4b2a85;">
+        <!-- Back Button -->
+        <button id="backButton"
+            style="display: none; position: absolute; top: 20px; left: 20px; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer;">
+            ← Retour
+        </button>
+        <div class="container">
+            <div class="row " style=" display: flex; align-items: center; justify-content: center; gap: 60px;">
+                <!-- Left Section: Text Content -->
+                <div class="col wow fadeInUp" style="text-align: center; color: #fff; padding: 20px;">
+                    <div class="hero-content wow fadeInUp">
+                        <h4 class="wow fadeInUp" data-wow-delay=".2s"
+                            style="font-size: 24px; font-weight: bold; color: #fff; font-family: 'Roboto', sans-serif;">
+                            Commencez à Investir & Gérer Vos Biens Immobiliers
+                        </h4>
+
+                        <h1 class="wow fadeInUp" data-wow-delay=".4s"
+                            style="font-size: 40px; font-weight: 800; line-height: 1.2; color: #fff;">
+                            Dites Adieu à <br>la Gestion Manuelle des <span style="color: #00bcd4;">Biens
+                                Immobiliers</span>.
+                        </h1>
+                        <p class="wow fadeInUp" data-wow-delay=".6s"
+                            style="font-size: 20px; font-weight: 100; max-width: 450px; margin-top: 20px; ">
+                            Investissez dans l'immobilier de manière sécurisée grâce à des contrats intelligents basés
+                            sur la blockchain.
+                        </p>
+                        <div class="button wow fadeInUp" data-wow-delay=".8s" style="margin-top: 30px;">
+                            <button id="connectButton" class="btn"
+                                style="padding: 14px 28px; font-size: 18px; background-color: #007bff; color: #fff; border: none; border-radius: 30px; box-shadow: 0px 6px 15px rgba(0, 123, 255, 0.3); transition: all 0.3s ease; display: flex; align-items: center; gap: 10px;"
+                                onmouseover="this.style.backgroundColor='#0056b3'; this.style.color='#f0f0f0'; this.style.boxShadow='0px 8px 20px rgba(0, 86, 179, 0.5)'; this.style.transform='scale(1.02)';"
+                                onmouseout="this.style.backgroundColor='#007bff'; this.style.color='#fff'; this.style.boxShadow='0px 6px 15px rgba(0, 123, 255, 0.3)'; this.style.transform='scale(1)';">
+                                <img src="images/Metamask.png" alt="MetaMask Icon" style="width: 24px; height: 24px;">
+                                Connecter votre MetaMask
+                            </button>
+                            <br>
+                            <div style="color: #00bcd4;" id="status" class="status"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Section: Hero Image -->
+                <div class="col" style="text-align: right; padding-right: 0;">
+                    <div class="hero-image"
+                        style="position: relative; display: flex; justify-content: right; align-items: right;">
+                        <!-- Main Image -->
+                        <img class="main-image wow fadeInUp" src="hero/home2-bg.png" alt="Main Image"
+                            style="max-width: 100%;  animation-duration: 3s;">
+                        <!-- Overlay Images Positioned with Absolute -->
+                        <img class="h2-move-1 wow fadeInUp" src="hero/h2-bit-l.png" alt="Image 1"
+                            style="position: absolute; top: 15%; left: 10%; max-width: 20%; animation-duration: 3s; animation-delay: 0.6s;">
+                        <img class="h2-move-2 wow fadeInUp" src="hero/h2-bit-m.png" alt="Image 2"
+                            style="position: absolute; top: 50%; left: 40%; max-width: 20%; animation-duration: 3s; animation-delay: 0.6s;">
+                        <img class="h2-move-3 wow fadeInUp" src="hero/h2-bit-s.png" alt="Image 3"
+                            style="position: absolute; top: 75%; left: 10%; max-width: 20%; animation-duration: 3s; animation-delay: 0.6s;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <!-- Footer Section -->
+    <footer style="background-color: #3c2371; color: #fff; padding: 20px 0; text-align: center;">
+        <div class="container">
+            <h4 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;  font-family: 'Roboto', sans-serif;">
+                Technologies Utilisées</h4>
+            <!-- Images Section -->
+            <div
+                style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; font-family: 'Roboto', sans-serif;">
+                <!-- RemixIDE -->
+                <div style="text-align: center;">
+                    <img src="images/remixIDE.png" alt="RemixIDE" style="width: 60px; height: 60px;">
+                    <p style="margin-top: 8px; font-size: 14px;">RemixIDE</p>
+                </div>
+                <!-- MetaMask -->
+                <div style="text-align: center;">
+                    <img src="images/Metamask.png" alt="MetaMask" style="width: 60px; height: 60px;">
+                    <p style="margin-top: 8px; font-size: 14px;">MetaMask</p>
+                </div>
+                <!-- Web3 -->
+                <div style="text-align: center;">
+                    <img src="images/web3.jpg" alt="Web3" style="width: 60px; height: 60px;">
+                    <p style="margin-top: 8px; font-size: 14px;">Web3</p>
+                </div>
+                <!-- Blockchain -->
+                <div style="text-align: center;">
+                    <img src="images/Blockchaine.png" alt="Blockchain" style="width: 60px; height: 60px;">
+                    <p style="margin-top: 8px; font-size: 14px;">Blockchain</p>
+                </div>
+                <!-- Ethereum -->
+                <div style="text-align: center;">
+                    <img src="images/ethereum.png" alt="Ethereum" style="width: 60px; height: 60px;">
+                    <p style="margin-top: 8px; font-size: 14px;">Ethereum</p>
+                </div>
+                <!-- Sepolia Testnet -->
+                <div style="text-align: center;">
+                    <img src="images/sepoliaTestnet.png" alt="Sepolia Testnet" style="width: 60px; height: 60px;">
+                    <p style="margin-top: 8px; font-size: 14px;">Sepolia Testnet</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <script>
+        let web3;
+        let account;
+        let contract;
+        const contractAddress = "0x658b410E58c92417047AeA7cBed11dcf38A30B95";  // Remplace avec l'adresse de ton contrat déployé
+
+
+        // Charger l'ABI depuis un fichier JSON
+        async function loadABI() {
+            try {
+                const response = await fetch('contractABI.json'); // Chemin relatif vers le fichier contractABI.json
+                const abi = await response.json();
+                return abi;
+            } catch (error) {
+                console.error('Error loading ABI:', error);
+            }
+        }
+        // Fonction de connexion à MetaMask
+        async function connectToMetaMask() {
+            if (window.ethereum) {
+                console.log("MetaMask detected.");
+                web3 = new Web3(window.ethereum);
+                try {
+                    console.log("Requesting MetaMask connection...");
+                    await ethereum.request({ method: "eth_requestAccounts" });
+                    account = (await web3.eth.getAccounts())[0];
+                    console.log("Connected account:", account);
+
+                    // Charger l'ABI depuis le fichier JSON
+                    const contractABI = await loadABI();
+                    if (contractABI) {
+                        // Initialisation du contrat
+                        contract = new web3.eth.Contract(contractABI, contractAddress);
+                        console.log("Contract methods:", contract.methods);
+                        console.log("Web3 version:", web3.version);
+
+                        // Enregistrement des informations dans localStorage
+                        localStorage.setItem("userAccount", account);
+                        localStorage.setItem("isConnected", "true");
+                        localStorage.setItem("lastConnected", new Date().toISOString());
+
+                        console.log("Data stored in localStorage:");
+                        console.log("userAccount:", localStorage.getItem("userAccount"));
+                        console.log("isConnected:", localStorage.getItem("isConnected"));
+                        console.log("lastConnected:", localStorage.getItem("lastConnected"));
+
+                        // Mise à jour du statut dans l'interface
+                        document.getElementById("status").innerText = `Connected: ${account}`;
+
+                        // Redirection après la connexion
+                        setTimeout(() => {
+                            window.location.href = "app.html";
+                        }, 1000); // Attente pour permettre la mise à jour visuelle
+                    }
+                } catch (error) {
+                    console.error("Error during MetaMask connection:", error);
+                    alert("MetaMask connection failed. Please try again.");
+                }
+            } else {
+                console.error("MetaMask not found.");
+                alert("Please install MetaMask to use this DApp!");
+            }
+        }
+
+        // Ajouter un écouteur d'événements au bouton
+        document.getElementById("connectButton").addEventListener("click", connectToMetaMask);
+
+
+        // Show the back button if the user is already connected
+        window.onload = function () {
+            const userAccount = localStorage.getItem("userAccount");
+            if (userAccount) {
+                document.getElementById("backButton").style.display = "block";
+            }
+        };
+
+        // Back button functionality
+        document.getElementById("backButton").addEventListener("click", function () {
+            window.history.back();
+        });
+    </script>
+</body>
+
+</html>

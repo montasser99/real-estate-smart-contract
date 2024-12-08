@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/web3@4.16.0/dist/web3.min.js"></script>
+    <title>Properties</title>
+    <link rel="stylesheet" href="app.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div>
+            <a href="index.html">Accueil</a>
+            <a href="profil.html">Profil</a>
+            <a href="app.html">Contrat</a>
+            <a href="properties.html" id="mesProperty">tous mes proprietes</a>
+
+        </div>
+        <div>
+            <a href="#" onclick="logout()">Déconnecter</a>
+        </div>
+    </nav>
+
+    <div style="padding: 50px;">
+        <h1>Tous mes Properties</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Price (ETH)</th>
+                    <th>Owner</th>
+                    <th>Actions</th> <!-- Nouvelle colonne pour les actions -->
+
+                </tr>
+            </thead>
+            <tbody id="propertiesTable">
+                <!-- Properties will be displayed here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Contract address (replace with your actual contract address)
+        const contractAddress = "0x658b410E58c92417047AeA7cBed11dcf38A30B95";
+
+        // Initialize Web3 and contract variables
+        let web3;
+        let contract;
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const currentPage = window.location.href; // Récupérer l'URL actuelle
+
+            // Sélectionner tous les liens
+            const homeLink = document.querySelector('a[href="index.html"]');
+            const profileLink = document.querySelector('a[href="profil.html"]');  // Corrected to match profil.html
+            const contractLink = document.getElementById("mesProperty");
+
+            // Appliquer la classe active selon l'URL actuelle
+            if (currentPage.includes("index.html")) {
+                homeLink.classList.add("active");
+            } else if (currentPage.includes("profil.html")) {  // Corrected here as well
+                profileLink.classList.add("active");
+            } else if (currentPage.includes("properties.html")) {  // Ensure this checks for app.html
+                contractLink.classList.add("active");
+            }
+        });
+
+
+        // Function to load ABI from external JSON file
+        async function loadABI() {
+            try {
+                const response = await fetch('contractABI.json'); // Path to your ABI file
+                const abi = await response.json();
+                console.log("Loaded ABI:", abi); // Log the ABI to check it
+                return abi;
+            } catch (error) {
+                console.error('Error loading ABI:', error);
+            }
+        }
+
+        // Initialize the web3 and contract
+        async function init() {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const accounts = await web3.eth.getAccounts();
+                console.log("Connected Account:", accounts[0]);
+
+                const abi = await loadABI(); // Load ABI from JSON file
+                contract = new web3.eth.Contract(abi, contractAddress);
+
+                // Log the contract methods to verify if getAllProperties is available
+                console.log("Contract methods:", contract.methods);
+
+                // Check if the method exists
+                if (contract.methods.getAllProperties) {
+                    console.log("Contract method available: getAllProperties");
+                } else {
+                    console.error("Contract method not found.");
+                }
+
+                await displayProperties();
+            } else {
+                alert("Please install MetaMask.");
+            }
+        }
+
+        // Function to display all properties
+        async function displayProperties() {
+            try {
+                // Fetch all properties from the contract
+                const properties = await contract.methods.getAllProperties().call();
+                console.log("Fetched properties:", properties); // Log the properties
+
+                // Construct rows for the table
+                let tableContent = '';
+                properties.forEach(property => {
+                    tableContent += `
+                        <tr>
+                            <td>${property.id}</td>
+                            <td>${property.name}</td>
+                            <td>${property.location}</td>
+                            <td>${web3.utils.fromWei(property.price.toString(), 'ether')} ETH</td>
+                            <td>${property.currentOwner}</td>
+                            <td><button onclick="deleteProperty(${property.id})">Supprimer</button></td> <!-- Bouton de suppression -->
+                        </tr>
+                    `;
+                });
+
+                // Inject the table rows into the HTML
+                document.getElementById('propertiesTable').innerHTML = tableContent;
+            } catch (error) {
+                console.error('Error displaying properties:', error);
+            }
+        }
+
+        // Run initialization when the page is ready
+        window.onload = init;
+
+        function logout() {
+            localStorage.removeItem("userAccount");
+            alert("You have been logged out.");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+
+</html>
